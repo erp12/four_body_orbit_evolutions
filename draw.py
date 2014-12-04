@@ -1,5 +1,6 @@
 __author__ = 'Eddie Pantridge'
 
+import math
 import pygame as pg
 from pygame.locals import *
 import util as u
@@ -19,14 +20,17 @@ def init_draw(states, masses=[1, 1, 1, 1]):
     caption=pg.display.set_caption("Evovling Orbits")
 
     BG_COLOR = (20, 20, 20)
+    STABLE_COLOR = (20, 80, 80)
     pg.draw.rect(screen ,BG_COLOR, Rect(0, 0, 600, 600))
     pg.display.flip()
 
     clock = pg.time.Clock()
+    myfont = pg.font.SysFont("monospace", 15)
 
     colors = [(255, 0, 0), (0, 255, 0), (0, 0, 255), (255, 255, 0)]
     trails = pg.sprite.Group()
 
+    frame_count = 0
     for s in states:
         for event in pg.event.get():
             if event.type == QUIT:
@@ -39,10 +43,18 @@ def init_draw(states, masses=[1, 1, 1, 1]):
         count = 0
         for pos in positions:
             pos = u.position_mult_scalars(pos, [250])
+            if math.isnan(pos[0]):
+                pos[0] = 0
+            if math.isnan(pos[1]):
+                pos[1] = 0
             draw_pos = [int(pos[0]+300), int(pos[1]+300)]
-            pg.draw.circle(screen, (255, 255, 255), draw_pos, 10*masses[count])
+            pg.draw.circle(screen, (255, 255, 255), draw_pos, int(10*masses[count]))
             trails.add(Trail_Point(colors[count], draw_pos[0], draw_pos[1]))
             count += 1
 
+        label = myfont.render(str(frame_count), 1, (255, 255, 0))
+        screen.blit(label, (300, 300))
+
         pg.display.flip()
-        clock.tick(60)
+        frame_count += 1
+        #clock.tick(120)

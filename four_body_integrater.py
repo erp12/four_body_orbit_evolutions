@@ -5,6 +5,7 @@ import numpy as np
 import math
 import util as u
 import draw
+import analize_system
 
 # Global simulation variables
 gravity = 1
@@ -84,4 +85,7 @@ test_system = [1, 1, 1, 1,
                0, -.8,
                .8, 0]
 
-draw.init_draw(get_estimates(test_system), test_system[:4])
+#e = get_estimates(test_system)
+#draw.init_draw(e, test_system[:4])
+#print
+#print analize_system.total_error(e, test_system[4:])
