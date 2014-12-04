@@ -1,6 +1,7 @@
 __author__ = 'Eddie Pantridge'
 
 import random
+import math
 from deap import base, creator, tools
 
 import four_body_integrater
@@ -13,7 +14,7 @@ creator.create("Individual", list, fitness=creator.FitnessMin)
 IND_SIZE = 20
 
 def rand_init_val():
-    return random.uniform(0.0, 3.0)
+    return random.uniform(-3.0, 3.0)
 
 toolbox = base.Toolbox()
 toolbox.register("attribute", rand_init_val)
@@ -23,13 +24,16 @@ toolbox.register("population", tools.initRepeat, list, toolbox.individual)
 def evaluate(individual):
     #print individual
     estimates = four_body_integrater.get_estimates(individual)
-    draw.init_draw(estimates, individual[:4])
+    masses = []
+    for i in individual[:4]:
+        masses.append(math.fabs(i))
+    draw.init_draw(estimates, masses)
     return [analize_system.total_error(estimates,
                                       individual[4:])]
 
-toolbox.register("mate", tools.cxTwoPoint)
+toolbox.register("mate", tools.cxUniform, indpb=0.5)
 toolbox.register("mutate", tools.mutGaussian, mu=0, sigma=1, indpb=0.1)
-toolbox.register("select", tools.selTournament, tournsize=5)
+toolbox.register("select", tools.selTournament, tournsize=15)
 toolbox.register("evaluate", evaluate)
 
 ERROR_TOLERANCE = 0.01
@@ -37,8 +41,8 @@ ERROR_TOLERANCE = 0.01
 stable_system = None
 
 def main():
-    pop = toolbox.population(n=7)
-    CXPB, MUTPB = 0.5, 0.2
+    pop = toolbox.population(n=100)
+    CXPB, MUTPB = 0.5, 0.5
 
     generation_number = 0
 
@@ -81,6 +85,8 @@ def main():
 
         # The population is entirely replaced by the offspring
         pop[:] = offspring
+        #print generation_number
+        generation_number += 1
 
     return pop
 
