@@ -12,7 +12,7 @@ def distance(x, y, x2, y2):
 
 # returns length of vector
 def length(vec):
-    return math.sqrt(math.pow(vec[0], 2)+math.pow(vec[1], 2))
+    return math.sqrt(math.pow(vec[0], 2) + math.pow(vec[1], 2))
 
 # vector subtraction
 def position_sub(v1, v2):

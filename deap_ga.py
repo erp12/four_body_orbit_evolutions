@@ -1,14 +1,14 @@
 __author__ = 'Eddie Pantridge'
 
 import random
-from deap import base, creator, tools
+from deap import base, creator, tools, benchmarks
 
 import four_body_integrater
 import analize_system
 import draw
 
-creator.create("FitnessMin", base.Fitness, weights=(-1.0,))
-creator.create("Individual", list, fitness=creator.FitnessMin)
+creator.create("Fitness", base.Fitness, weights=(-1.0, -1.0))
+creator.create("Individual", list, fitness=creator.Fitness)
 
 IND_SIZE = 20
 
@@ -24,20 +24,19 @@ def evaluate(individual):
     #print individual
     estimates = four_body_integrater.get_estimates(individual)
     draw.init_draw(estimates, individual[:4])
-    return [analize_system.total_error(estimates,
-                                      individual[4:])]
+    return [analize_system.total_return_error(estimates, individual[4:])]
 
 toolbox.register("mate", tools.cxTwoPoint)
 toolbox.register("mutate", tools.mutGaussian, mu=0, sigma=1, indpb=0.1)
-toolbox.register("select", tools.selTournament, tournsize=5)
-toolbox.register("evaluate", evaluate)
+toolbox.register("select", tools.selNSGA2)
+toolbox.register("evaluate", benchmarks.zdt1)
 
 ERROR_TOLERANCE = 0.01
 
 stable_system = None
 
 def main():
-    pop = toolbox.population(n=7)
+    pop = toolbox.population(n=20)
     CXPB, MUTPB = 0.5, 0.2
 
     generation_number = 0
