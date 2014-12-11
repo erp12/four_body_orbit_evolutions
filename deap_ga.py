@@ -28,20 +28,19 @@ def evaluate(individual):
     for i in individual[:4]:
         masses.append(math.fabs(i))
     draw.init_draw(estimates, masses)
-    return [analize_system.total_error(estimates,
-                                      individual[4:])]
+    return analize_system.total_return_error(estimates, individual[4:]), analize_system.delta_direction(estimates, individual[4:])
 
 toolbox.register("mate", tools.cxUniform, indpb=0.5)
 toolbox.register("mutate", tools.mutGaussian, mu=0, sigma=1, indpb=0.1)
 toolbox.register("select", tools.selNSGA2)
-toolbox.register("evaluate", benchmarks.zdt1)
+toolbox.register("evaluate", evaluate)
 
 ERROR_TOLERANCE = 0.01
 
 stable_system = None
 
 def main():
-    pop = toolbox.population(n=100)
+    pop = toolbox.population(n=50)
     CXPB, MUTPB = 0.5, 0.5
 
     generation_number = 0
