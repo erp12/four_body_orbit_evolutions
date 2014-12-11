@@ -10,7 +10,7 @@ import analize_system
 # Global simulation variables
 gravity = 1
 dt = .01
-T = 5
+T = 8
 N = T/dt+1
 times = u.frange(0, T, dt)
 

@@ -42,13 +42,13 @@ def init_draw(states, masses=[1, 1, 1, 1]):
 
         count = 0
         for pos in positions:
-            pos = u.position_mult_scalars(pos, [250])
+            pos = u.position_mult_scalars(pos, [100])
             if math.isnan(pos[0]):
                 pos[0] = 0
             if math.isnan(pos[1]):
                 pos[1] = 0
             draw_pos = [int(pos[0]+300), int(pos[1]+300)]
-            pg.draw.circle(screen, (255, 255, 255), draw_pos, int(10*masses[count]))
+            pg.draw.circle(screen, (255, 255, 255), draw_pos, abs(int(10*masses[count])))
             trails.add(Trail_Point(colors[count], draw_pos[0], draw_pos[1]))
             count += 1
 
