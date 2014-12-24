@@ -8,17 +8,27 @@ import four_body_integrater
 import analize_system
 import draw
 
+############################################################
+# System arguments
+############################################################
+ERROR_TOLERANCE = 0.01
+POPULATION_SIZE = 50
+CROSSOVER_PROB = 0.7
+MUTATION_PROB = 0.3
+INDIVIDUAL_SIZE = 20 # 4 Masses, 4 xy position pairs (8 total), 4 xy velocity pairs (8 total)
+
+#################
+# Setting up GA
+#################
 creator.create("Fitness", base.Fitness, weights=(-1.0, -1.0))
 creator.create("Individual", list, fitness=creator.Fitness)
-
-IND_SIZE = 20
 
 def rand_init_val():
     return random.uniform(-3.0, 3.0)
 
 toolbox = base.Toolbox()
 toolbox.register("attribute", rand_init_val)
-toolbox.register("individual", tools.initRepeat, creator.Individual, toolbox.attribute, n=IND_SIZE)
+toolbox.register("individual", tools.initRepeat, creator.Individual, toolbox.attribute, n=INDIVIDUAL_SIZE)
 toolbox.register("population", tools.initRepeat, list, toolbox.individual)
 
 def evaluate(individual):
@@ -35,13 +45,10 @@ toolbox.register("mutate", tools.mutGaussian, mu=0, sigma=1, indpb=0.1)
 toolbox.register("select", tools.selNSGA2)
 toolbox.register("evaluate", evaluate)
 
-ERROR_TOLERANCE = 0.01
-
 stable_system = None
 
 def main():
-    pop = toolbox.population(n=50)
-    CXPB, MUTPB = 0.5, 0.5
+    pop = toolbox.population(n=POPULATION_SIZE)
 
     generation_number = 0
 
@@ -60,13 +67,13 @@ def main():
 
         # Apply crossover and mutation on the offspring
         for child1, child2 in zip(offspring[::2], offspring[1::2]):
-            if random.random() < CXPB:
+            if random.random() < CROSSOVER_PROB:
                 toolbox.mate(child1, child2)
                 del child1.fitness.values
                 del child2.fitness.values
 
         for mutant in offspring:
-            if random.random() < MUTPB:
+            if random.random() < MUTATION_PROB:
                 toolbox.mutate(mutant)
                 del mutant.fitness.values
 
@@ -74,7 +81,7 @@ def main():
         invalid_ind = [ind for ind in offspring if not ind.fitness.valid]
         fitnesses = map(toolbox.evaluate, invalid_ind)
         for ind, fit in zip(invalid_ind, fitnesses):
-            if fit < ERROR_TOLERANCE:
+            if fit < ERROR_TOLERANCE-4:
                 is_stable = True
                 global stable_system
                 stable_system = ind
@@ -91,3 +98,15 @@ def main():
 
 if __name__ == "__main__":
     main()
+
+
+# Simple, stable, orbiting system
+test_system = [1, 1, 1, 1,
+               1, 0,
+               0, 1,
+               -1, 0,
+               0, -1,
+               0, .8,
+               -.8, 0,
+               0, -.8,
+               .8, 0]

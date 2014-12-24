@@ -48,7 +48,9 @@ def body_4_vel_error(estimate, initial):
 ##################################
 
 def angle_between_velocities(new_vel, inital_vel):
-    return math.fabs(u.length(new_vel)*u.length(inital_vel))
+    v1 = u.normalize(new_vel)
+    v2 = u.normalize(inital_vel)
+    return (v1[0]*v2[0]) + (v1[1]*v2[1])
 
 
 def total_state_angular_fitness(estimate, initial):
@@ -77,12 +79,12 @@ def total_state_return_error(estimate, initial):
 def total_return_error(estimates, initial):
     errors = []
     for e in estimates[5:]:
-        #print total_state_error(e, initial)
         errors.append(total_state_return_error(e, initial))
     return min(errors)
 
 def delta_direction(estimates, initial):
     changes_in_direction = [] # in degrees
     for e in estimates:
+        print total_state_angular_fitness(e, initial)
         changes_in_direction.append(total_state_angular_fitness(e, initial))
     return min(changes_in_direction)

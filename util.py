@@ -14,6 +14,11 @@ def distance(x, y, x2, y2):
 def length(vec):
     return math.sqrt(math.pow(vec[0], 2) + math.pow(vec[1], 2))
 
+# returns normalized vecotr
+def normalize(vec):
+    l = length(vec)
+    return [vec[0]/l, vec[1]/l]
+
 # vector subtraction
 def position_sub(v1, v2):
     return [v1[0]-v2[0], v1[1]-v2[1]]
