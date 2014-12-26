@@ -85,7 +85,7 @@ test_system = [1, 1, 1, 1,
                0, -.8,
                .8, 0]
 
-e = get_estimates(test_system)
+#e = get_estimates(test_system)
 #draw.init_draw(e, test_system[:4])
 #print
-print analize_system.delta_direction(e, test_system[4:])
+#print analize_system.delta_direction(e, test_system[4:])

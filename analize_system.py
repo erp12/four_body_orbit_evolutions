@@ -85,6 +85,6 @@ def total_return_error(estimates, initial):
 def delta_direction(estimates, initial):
     changes_in_direction = [] # in degrees
     for e in estimates:
-        print total_state_angular_fitness(e, initial)
+        #print total_state_angular_fitness(e, initial)
         changes_in_direction.append(total_state_angular_fitness(e, initial))
     return min(changes_in_direction)

@@ -1,8 +1,9 @@
 __author__ = 'Eddie Pantridge'
 
 import random
-from deap import base, creator, tools, benchmarks
+from deap import base, creator, tools, benchmarks, algorithms
 import math
+import numpy
 
 import four_body_integrater
 import analize_system
@@ -11,6 +12,7 @@ import draw
 ############################################################
 # System arguments
 ############################################################
+DRAW_WHILE_EVO = False
 ERROR_TOLERANCE = 0.01
 POPULATION_SIZE = 50
 CROSSOVER_PROB = 0.7
@@ -37,13 +39,20 @@ def evaluate(individual):
     masses = []
     for i in individual[:4]:
         masses.append(math.fabs(i))
-    draw.init_draw(estimates, masses)
+    if DRAW_WHILE_EVO:
+        draw.init_draw(estimates, masses)
     return analize_system.total_return_error(estimates, individual[4:]), analize_system.delta_direction(estimates, individual[4:])
 
 toolbox.register("mate", tools.cxUniform, indpb=0.5)
 toolbox.register("mutate", tools.mutGaussian, mu=0, sigma=1, indpb=0.1)
 toolbox.register("select", tools.selNSGA2)
 toolbox.register("evaluate", evaluate)
+
+# have DEAP keep track of some stats
+stats = tools.Statistics(key=lambda ind: ind.fitness.values)
+stats.register("avg", numpy.mean)
+#stats.register("std", numpy.std)
+stats.register("min", numpy.min)
 
 stable_system = None
 
@@ -96,8 +105,17 @@ def main():
 
     return pop
 
+
+def test_main():
+    pop = toolbox.population(n=POPULATION_SIZE)
+    HoF = tools.HallOfFame(3)
+    pop, logbook = algorithms.eaSimple(pop, toolbox, cxpb=CROSSOVER_PROB, mutpb=MUTATION_PROB, ngen=1000,
+                                       stats=stats, halloffame= HoF, verbose=True)
+
+
+
 if __name__ == "__main__":
-    main()
+    test_main()
 
 
 # Simple, stable, orbiting system
