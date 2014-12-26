@@ -47,9 +47,12 @@ def init_draw(states, masses=[1, 1, 1, 1]):
                 pos[0] = 0
             if math.isnan(pos[1]):
                 pos[1] = 0
-            draw_pos = [int(pos[0]+300), int(pos[1]+300)]
-            pg.draw.circle(screen, (255, 255, 255), draw_pos, abs(int(10*masses[count])))
-            trails.add(Trail_Point(colors[count], draw_pos[0], draw_pos[1]))
+            try:
+                draw_pos = [int(pos[0]+300), int(pos[1]+300)]
+                pg.draw.circle(screen, (255, 255, 255), draw_pos, abs(int(10*masses[count])))
+                trails.add(Trail_Point(colors[count], draw_pos[0], draw_pos[1]))
+            except OverflowError:
+                print "Could not draw frame. OverflowError!"
             count += 1
 
         label = myfont.render(str(frame_count), 1, (255, 255, 0))

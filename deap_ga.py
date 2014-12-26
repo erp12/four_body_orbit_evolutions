@@ -17,9 +17,9 @@ CROSSOVER_PROB = 0.7
 MUTATION_PROB = 0.3
 INDIVIDUAL_SIZE = 20 # 4 Masses, 4 xy position pairs (8 total), 4 xy velocity pairs (8 total)
 
-#################
+####################
 # Setting up GA
-#################
+####################
 creator.create("Fitness", base.Fitness, weights=(-1.0, -1.0))
 creator.create("Individual", list, fitness=creator.Fitness)
 
