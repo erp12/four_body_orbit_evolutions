@@ -20,6 +20,7 @@ ERROR_TOLERANCE = 0.01
 POPULATION_SIZE = 50
 CROSSOVER_PROB = 0.7
 MUTATION_PROB = 0.3
+MUTATION_SIGMA = 0.3
 INDIVIDUAL_SIZE = 20  # 4 Masses, 4 xy position pairs (8 total), 4 xy velocity pairs (8 total)
 NUM_BEST_INDS_TO_RECORD = 5
 NUM_GENERATIONS = 1000
@@ -28,6 +29,7 @@ INITIAL_POSITION_MAGNITUDE = 3.0
 INITIAL_VELOCITY_MAGNITUDE = 3.0
 INITIAL_MASS_MAX = 3.0
 
+# Global initialization of deap creators needed for creation of individuals
 creator.create("Fitness", base.Fitness, weights=(-1.0, -1.0))
 creator.create("Individual", list, fitness=creator.Fitness)
 
@@ -62,16 +64,13 @@ def evaluate(individual):
         masses.append(math.fabs(i))
     if DRAW_WHILE_EVO:
         draw.init_draw(estimates, masses)
-    return analize_system.total_return_error(estimates, individual[4:]), analize_system.delta_direction(estimates,
-                                                                                                        individual[4:])
+    return analize_system.total_return_error(estimates, individual[4:]), analize_system.delta_direction(estimates, individual[4:])
 
 def main():
 
     #####################################################################################
     # Setting up GA
     #####################################################################################
-
-    print creator.Individual()
 
     toolbox = base.Toolbox()
     # toolbox.register("attribute", rand_init_pos)
@@ -90,7 +89,7 @@ def main():
         toolbox.register("map", pool.map)
 
     toolbox.register("mate", tools.cxUniform, indpb=0.5)
-    toolbox.register("mutate", tools.mutGaussian, mu=0, sigma=1, indpb=0.1)
+    toolbox.register("mutate", tools.mutGaussian, mu=0, sigma=MUTATION_SIGMA, indpb=0.1)
     toolbox.register("select", tools.selNSGA2)
     toolbox.register("evaluate", evaluate)
 
