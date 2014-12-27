@@ -14,10 +14,20 @@ def distance(x, y, x2, y2):
 def length(vec):
     return math.sqrt(math.pow(vec[0], 2) + math.pow(vec[1], 2))
 
-# returns normalized vecotr
+# returns normalized vector
 def normalize(vec):
     l = length(vec)
-    return [vec[0]/l, vec[1]/l]
+    newX = 0
+    newY = 0
+    try:
+        newX = vec[0]/l
+    except ZeroDivisionError:
+        newX = 0
+    try:
+        newY = vec[1]/l
+    except ZeroDivisionError:
+        newY = 0
+    return [newX, newY]
 
 # vector subtraction
 def position_sub(v1, v2):

@@ -1,9 +1,10 @@
 __author__ = 'Eddie Pantridge'
 
 import random
-from deap import base, creator, tools, benchmarks, algorithms
+from deap import base, creator, tools, algorithms
 import math
 import numpy
+import csv
 
 import four_body_integrater
 import analize_system
@@ -18,6 +19,12 @@ POPULATION_SIZE = 50
 CROSSOVER_PROB = 0.7
 MUTATION_PROB = 0.3
 INDIVIDUAL_SIZE = 20 # 4 Masses, 4 xy position pairs (8 total), 4 xy velocity pairs (8 total)
+NUM_BEST_INDS_TO_RECORD = 5
+NUM_GENERATIONS = 1000
+LENGTH_OF_SIMULATIONS = 800
+INITIAL_POSITION_MAGNITUDE = 3.0
+INITIAL_VELOCITY_MAGNITUDE = 3.0
+INITIAL_MASS_MAX = 3.0
 
 ####################
 # Setting up GA
@@ -25,12 +32,35 @@ INDIVIDUAL_SIZE = 20 # 4 Masses, 4 xy position pairs (8 total), 4 xy velocity pa
 creator.create("Fitness", base.Fitness, weights=(-1.0, -1.0))
 creator.create("Individual", list, fitness=creator.Fitness)
 
-def rand_init_val():
-    return random.uniform(-3.0, 3.0)
+def rand_init_pos():
+    return random.uniform(-INITIAL_POSITION_MAGNITUDE, INITIAL_POSITION_MAGNITUDE)
+
+def rand_init_vel():
+    return random.uniform(-INITIAL_VELOCITY_MAGNITUDE, INITIAL_VELOCITY_MAGNITUDE)
+
+def rand_init_mass():
+    return random.uniform(0.0, INITIAL_MASS_MAX)
+
+def create_ind(numMasses, numPositions, numVelocites):
+    ind = creator.Individual()
+    for i in range(numMasses):
+        ind.append(rand_init_mass())
+    for i in range(numPositions):
+        ind.append(rand_init_pos())
+    for i in range(numVelocites):
+        ind.append(numVelocites)
+    return ind
 
 toolbox = base.Toolbox()
-toolbox.register("attribute", rand_init_val)
-toolbox.register("individual", tools.initRepeat, creator.Individual, toolbox.attribute, n=INDIVIDUAL_SIZE)
+#toolbox.register("attribute", rand_init_pos)
+
+toolbox.register("massAttr", rand_init_mass)
+toolbox.register("positionAttr", rand_init_pos)
+toolbox.register("velocityAttr", rand_init_vel)
+toolbox.register("individual", create_ind, 4, 8, 8)
+#toolbox.register("individual", tools.initRepeat, creator.Individual,
+#                 (toolbox.positionAttr, toolbox),
+#                 n=INDIVIDUAL_SIZE)
 toolbox.register("population", tools.initRepeat, list, toolbox.individual)
 
 def evaluate(individual):
@@ -90,12 +120,6 @@ def main():
         invalid_ind = [ind for ind in offspring if not ind.fitness.valid]
         fitnesses = map(toolbox.evaluate, invalid_ind)
         for ind, fit in zip(invalid_ind, fitnesses):
-            if fit < ERROR_TOLERANCE-4:
-                is_stable = True
-                global stable_system
-                stable_system = ind
-                print "SOLUTION FOUND!"
-                print ind
             ind.fitness.values = fit
 
         # The population is entirely replaced by the offspring
@@ -108,9 +132,18 @@ def main():
 
 def test_main():
     pop = toolbox.population(n=POPULATION_SIZE)
-    HoF = tools.HallOfFame(3)
-    pop, logbook = algorithms.eaSimple(pop, toolbox, cxpb=CROSSOVER_PROB, mutpb=MUTATION_PROB, ngen=1000,
+    HoF = tools.HallOfFame(NUM_BEST_INDS_TO_RECORD)
+    pop, logbook = algorithms.eaSimple(pop, toolbox, cxpb=CROSSOVER_PROB, mutpb=MUTATION_PROB, ngen=NUM_GENERATIONS,
                                        stats=stats, halloffame= HoF, verbose=True)
+
+    # Write Hall of Fame to CSV file
+    resultFile = open("best_systems.csv",'wb')
+    wr = csv.writer(resultFile)
+    wr.writerows(HoF)
+
+    # Print CSV
+    for i in range(NUM_BEST_INDS_TO_RECORD):
+        print i, "best : ", HoF[i]
 
 
 
@@ -128,3 +161,11 @@ test_system = [1, 1, 1, 1,
                -.8, 0,
                0, -.8,
                .8, 0]
+
+# Code to be added later
+# if fit < ERROR_TOLERANCE-4:
+#     is_stable = True
+#     global stable_system
+#     stable_system = ind
+#     print "SOLUTION FOUND!"
+#     print ind
