@@ -42,7 +42,7 @@ def init_draw(states, masses=[1, 1, 1, 1]):
 
         count = 0
         for pos in positions:
-            pos = u.position_mult_scalars(pos, [100])
+            pos = u.position_mult_scalars(pos, [10])
             if math.isnan(pos[0]):
                 pos[0] = 0
             if math.isnan(pos[1]):
