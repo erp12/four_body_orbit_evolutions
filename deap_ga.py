@@ -28,6 +28,10 @@ LENGTH_OF_SIMULATIONS = 800  # not implemented yet
 INITIAL_POSITION_MAGNITUDE = 3.0
 INITIAL_VELOCITY_MAGNITUDE = 3.0
 INITIAL_MASS_MAX = 3.0
+MIN_MASS = 0.1
+MAX_MASS = 3.0
+MIN_POS_VEL = -3.0
+MAX_POS_VEL = 3.0
 
 # Global initialization of deap creators needed for creation of individuals
 creator.create("Fitness", base.Fitness, weights=(-1.0, -1.0))
@@ -66,6 +70,28 @@ def evaluate(individual):
         draw.init_draw(estimates, masses)
     return analize_system.total_return_error(estimates, individual[4:]), analize_system.delta_direction(estimates, individual[4:])
 
+# Decorator for mutation and crossover to keep the values in bounds.
+
+def checkBounds():
+    def decorator(func):
+        def wrapper(*args, **kargs):
+            offspring = func(*args, **kargs)
+            for child in offspring:
+                for i in xrange(len(child)):
+                    if i < 4:
+                        if child[i] > MAX_MASS:
+                            child[i] = MAX_MASS
+                        elif child[i] < MIN_MASS:
+                            child[i] = MIN_MASS
+                    else:
+                        if child[i] > MAX_POS_VEL:
+                            child[i] = MAX_POS_VEL
+                        elif child[i] < MIN_POS_VEL:
+                            child[i] = MIN_POS_VEL
+            return offspring
+        return wrapper
+    return decorator
+
 def main():
 
     #####################################################################################
@@ -90,6 +116,8 @@ def main():
 
     toolbox.register("mate", tools.cxUniform, indpb=0.5)
     toolbox.register("mutate", tools.mutGaussian, mu=0, sigma=MUTATION_SIGMA, indpb=0.1)
+    toolbox.decorate("mate", checkBounds())
+    toolbox.decorate("mutate", checkBounds())
     toolbox.register("select", tools.selNSGA2)
     toolbox.register("evaluate", evaluate)
 
