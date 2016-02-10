@@ -14,7 +14,7 @@ import draw
 ############################################################
 # System arguments
 ############################################################
-SINGLE_THREAD = False
+SINGLE_THREAD = True
 DRAW_WHILE_EVO = False
 ERROR_TOLERANCE = 0.01
 POPULATION_SIZE = 50
@@ -77,7 +77,7 @@ def checkBounds():
         def wrapper(*args, **kargs):
             offspring = func(*args, **kargs)
             for child in offspring:
-                for i in xrange(len(child)):
+                for i in range(len(child)):
                     if i < 4:
                         if child[i] > MAX_MASS:
                             child[i] = MAX_MASS
@@ -122,10 +122,10 @@ def main():
     toolbox.register("evaluate", evaluate)
 
     # have DEAP keep track of some stats
-    stats = tools.Statistics(key=lambda ind: ind.fitness.values)
-    stats.register("avg", numpy.mean)
+    my_stats = tools.Statistics(key=lambda ind: ind.fitness.values)
+    my_stats.register("avg", numpy.mean)
     #stats.register("std", numpy.std)
-    stats.register("min", numpy.min)
+    my_stats.register("min", numpy.min)
 
 
     #####################################################################################
@@ -133,8 +133,9 @@ def main():
     #####################################################################################
     pop = toolbox.population(n=POPULATION_SIZE)
     HoF = tools.HallOfFame(NUM_BEST_INDS_TO_RECORD)
-    pop, logbook = algorithms.eaSimple(pop, toolbox, cxpb=CROSSOVER_PROB, mutpb=MUTATION_PROB, ngen=NUM_GENERATIONS,
-                                       stats=stats, halloffame=HoF, verbose=True)
+    pop, logbook = algorithms.eaSimple(pop, toolbox, cxpb=CROSSOVER_PROB, 
+									   mutpb=MUTATION_PROB, ngen=NUM_GENERATIONS, 
+									   stats=my_stats, halloffame=HoF, verbose=True)
 
     # Write Hall of Fame to CSV file
     resultFile = open("best_systems.csv", 'wb')
@@ -143,7 +144,7 @@ def main():
 
     # Print CSV
     for i in range(NUM_BEST_INDS_TO_RECORD):
-        print i, "best : ", HoF[i]
+        print (i, "best : ", HoF[i])
 
 
 if __name__ == "__main__":
